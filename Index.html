@@ -5,15 +5,17 @@
       <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
       <title>Neighborhood Map</title>
       <link rel='stylesheet' type='text/css' href='css/style.css'>
+      <link rel= "stylesheet" media="screen and (max-width:500px)" href="css/styleMobile.css">
+      <link rel= "stylesheet" media="screen and (max-width:600px)" href="css/styleIpad.css">
   </head>
   <body>
   <div class="container">
       <div class="options-box">
-          <h1> My Neighborhood </h1>
+          <h1> My Neighborhood</h1>
           <div id="search-nav">
-              <input id="s-input" class="controls" type="search" data-bind="textInput: query, valueUpdate: 'keyup'"></input>
+              <h2>Shops</h2>
+              <label>search: </label><input id="s-input" class="controls" type="search" data-bind="textInput: query, valueUpdate: 'keyup'"></input>
               <div id="listbx">
-                  <h2>Shops</h2>
                   <div>
                       <ul data-bind="foreach: search()">
                           <li data-bind="text: title, click: $root.itemClick"></li>
@@ -27,11 +29,13 @@
 
 
 
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+  <script src="js/lib/jqueryVS3.min.js"></script>
+  <script src ="js/lib/oauth1/dist/oauth-signature.min.js"></script>
   <script type="text/javascript" src="js/lib/knockout-3.4.0.js"></script>
   <script type="text/javascript" src="js/script.js"></script>
   <script async defer
-          src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyBEBdmA6dLSC8khL68CWClW7hXSnqWlsvQ&v=3&callback=initMap" onerror="googleError()">
+          src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyCCdqeE-Oig-9a79o4kmcPoEdaa5ENFzuA&v=3&callback=initMap" onerror="googleError()">
 
   </script>
   </body>

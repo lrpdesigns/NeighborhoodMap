@@ -6,16 +6,11 @@
         transform: translate(-300px, 0);
         transition: transform 0.3s ease;
     }
-
-    .option-box.open {
-        -webkit-transform: translate(0, 0);
-        transform: translate(0, 0);
-    }
 }
 
 html,
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Helvetica Neue";
     height: 100%;
     width: 100%;
     margin: 0;
@@ -32,22 +27,15 @@ input {
 }
 
 h1 {
-    color: #525454;
-    font-size: 22px;
-    margin: 0 0 10px 0;
+    font-size: 30px;
+    margin: 10px 0 30px 0;
     text-align: center;
 }
 
-#hide-listings,
-#show-listings {
-    width: 48%;
-}
-
-hr {
-    background: #D0D7D9;
-    height: 1px;
-    margin: 20px 0 20px 0;
-    border: none;
+h2 {
+    font-size: 22px;
+    margin: 0 10px 0 0;
+    text-align: left;
 }
 
 #map {
@@ -59,8 +47,8 @@ hr {
 }
 
 .options-box {
-    background: #fff;
-    height: auto;
+    background-color: mintcream;
+    height: 100%;
     line-height: 35px;
     padding: 10px 10px 30px 10px;
     text-align: left;

@@ -11,7 +11,8 @@ var locations = [
         image: 'img/anthro.jpg',
         id: "nav0",
         visible: ko.observable(true),
-        test: true
+        test: true,
+        businessId: 'anthropologie-burlingame'
     },
     {
         title: 'Kate Spade',
@@ -20,7 +21,8 @@ var locations = [
         image: 'img/kate-spade-office.jpg',
         id: "nav1",
         visible: ko.observable(true),
-        test: true
+        test: true,
+        businessId: 'kate-spade-new-york-burlingame'
     },
     {
         title: 'Trina Turk',
@@ -29,7 +31,8 @@ var locations = [
         image: 'img/TrinaTurk.jpg',
         id: "nav2",
         visible: ko.observable(true),
-        test: true
+        test: true,
+        businessId: 'trina-turk-burlingame'
     },
     {
         title: 'The Podolls',
@@ -38,7 +41,8 @@ var locations = [
         image: 'img/podolls.jpg',
         id: "nav3",
         visible: ko.observable(true),
-        test: true
+        test: true,
+        businessId: 'the-podolls-burlingame'
     },
     {
         title: 'JCrew',
@@ -47,7 +51,8 @@ var locations = [
         image: 'img/jcrew.jpg',
         id: "nav4",
         visible: ko.observable(true),
-        test: true
+        test: true,
+        businessId: 'j-crew-burlingame'
     },
     {
         title: 'Les Deux Copines',
@@ -56,7 +61,8 @@ var locations = [
         image: 'img/lesdeuxcopines.jpg',
         id: "nav5",
         visible: ko.observable(true),
-        test: true
+        test: true,
+        businessId: 'les-deux-copines-burlingame'
     }
 ];
 
@@ -83,7 +89,6 @@ function initMap() {
 
     // A for loop to create a marker for each location
     for (var i = 0; i < locations.length; i++) {
-        console.log('hellooooo');
         var title = locations[i].title;
         var position = locations[i].location;
         var address = locations[i].address;
@@ -93,36 +98,42 @@ function initMap() {
             position: position,
             image: image,
             address: address,
-            id: i
+            id: i,
         });
 
         markers.push(marker);
         loadMarkers();
         marker.addListener('click', function() {
             populateInfoWindow(this, largeInfowindow);
+            toggleBounce(this, largeInfowindow);
         });
     }
 
 }
 
+function toggleBounce(marker, infowindow) {
+    if (infowindow.marker.getAnimation() !== null) {
+        infowindow.marker.setAnimation(null);
+    } else {
+        infowindow.marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
+            infowindow.marker.setAnimation(null);
+        }, 1400);
+    }
+}
+
 function populateInfoWindow(marker, infowindow) {
     // Ensures the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
+        infowindow.marker = marker;
         infowindow.setContent('<img src="' + marker.image + '" alt="Image of ' +
             marker.title + '"><br><hr style="margin-bottom: 5px"><strong>' +
-            marker.title + '</strong><br><p>' + marker.address);
-        infowindow.marker = marker;
+            marker.title + '</strong><br><p>' + marker.address + '</div>' + '<div>' + marker.phone + '</div>' + '<img id ="yelpLogo" src = "img/yelpLogo.jpg">');
         // Ensure the marker property is cleared if the infowindow is closed
+        infowindow.open(map, marker);
         infowindow.addListener('closeclick', function() {
             infowindow.marker = null;
         });
-        infowindow.open(map, marker);
-        // marker property is cleared if the infowindow is closed.
-        infowindow.addListener('closeclick', function () {
-            infowindow.marker(null);
-        });
-        // Open the infowindow on the correct marker
-        infowindow.open(map, marker);
     }
 }
 
@@ -130,6 +141,7 @@ function populateInfoWindow(marker, infowindow) {
 function loadMarkers() {
     var bounds = new google.maps.LatLngBounds();
     for (var i = 0; i < markers.length; i++) {
+        locations[i].marker = markers[i];
         markers[i].setMap(map);
         bounds.extend(markers[i].position);
     }
@@ -138,22 +150,115 @@ function loadMarkers() {
 
 
 
+
 var viewModel = function() {
     var self = this;
     self.itemClick = function(marker) {
-        console.log(this);
         google.maps.event.trigger(this.marker, 'click');
+        toggleBounce(this, largeInfowindow);
     };
 
+
+    for (var j = 0; j < markers.length; j++){
+        console.log(markers[j]);
+    }
+
     self.points = ko.observableArray(locations);
+    console.log(self.points.length);
+
 
     self.query = ko.observable('');
 
     self.search = ko.computed(function(){
-        return ko.utils.arrayFilter(self.points(), function(point){
-            return point.title.toLowerCase().indexOf(self.query().toLowerCase()) >= 0;
-        });
+
+        if (!self.query() || self.query === undefined) {
+            // Show every marker.
+            for (var i = 0; i < self.points().length; i++) {
+                if (self.points()[i].marker !== undefined) {
+                    self.points()[i].marker.setVisible(true); // Shows the marker
+                }
+            }
+            return self.points();
+        } else{
+            filter = self.query().toLowerCase();
+
+            return ko.utils.arrayFilter(self.points(),
+                function(point){
+                var match = point.title.toLocaleLowerCase().indexOf(filter) > -1;
+                // return point.title.toLowerCase().indexOf(self.query().toLowerCase()) >= 0;
+                point.marker.setVisible(match);
+
+                return match;
+            });
+        }
+
+
     });
+};
+
+//Authentication for YELP API
+//Generates a random number and returns it as a string for OAuthentication
+function nonce_generate() {
+    return (Math.floor(Math.random() * 1e12).toString());
+}
+
+//Information from yelp
+var consumer_key = <consumer_key>;
+var token = <token> ;
+var secret_key = <secret_key> ;
+var secret_token = <secret_token>; 
+
+//Ajax request, to be called later
+var yelpCaller = function(place){
+    //Url variable
+    var yelp_url = "https://api.yelp.com/v2/business/" + place.businessId;
+    //Search parameters for my YELP search
+    var parameters = {
+        oauth_consumer_key: consumer_key,
+        oauth_token: token,
+        oauth_nonce: nonce_generate(),
+        oauth_timestamp: Math.floor(Date.now()/1000),
+        oauth_signature_method: 'HMAC-SHA1',
+        oauth_version : '1.0',
+        callback: 'cb',
+        location: '94010',
+        term: 'shops',
+        limit: 10
+    };
+    var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, secret_key, secret_token);
+    //Store the encoded signature as a property of the parameters object
+    parameters.oauth_signature = encodedSignature;
+    var settings = {
+        url: yelp_url,
+        data: parameters,
+        // prevents jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+        cache: true,
+        dataType: 'jsonp',
+        success: function(results) {
+            // apply results
+            console.log(results);
+            //If YELP doesn't return any phone number data (so the result is undefined), an error message is displayed
+            if(results.display_phone == undefined){
+                place.marker.phone = "No phone number provided by Yelp API";
+            }
+            else{
+                //This creates a phone property on the marker
+                place.marker.phone =  results.display_phone;
+            }
+        },
+        error: function() {
+            place.marker.phone = 'Yelp API data could not be retrieved';
+            console.log("fail");
+        }
+    };
+
+    // Send AJAX query via jQuery library.
+    $.ajax(settings);
+}
+
+//This loops through all of the objects in the locations array and calls the function that retrieves the phone numbers from the stores
+for(var i=0; i<locations.length; i++){
+    yelpCaller(locations[i]);
 };
 
 ko.applyBindings(new viewModel());
