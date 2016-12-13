@@ -203,10 +203,10 @@ function nonce_generate() {
 }
 
 //Information from yelp
-var consumer_key = <consumer_key>;
-var token = <token> ;
-var secret_key = <secret_key> ;
-var secret_token = <secret_token>; 
+var consumer_key = "yL9ObhUNJeCPm9qCHYZUQQ";
+var token = "-ucqMH9TQqKg-notDbB7epIw-YjKvk32";
+var secret_key = "dKgI4pSbQZfFBrv6eMhsMAxhnuI";
+var secret_token = "qdgeFrMhQuX9HtLF7ewZZFoElIY";
 
 //Ajax request, to be called later
 var yelpCaller = function(place){
