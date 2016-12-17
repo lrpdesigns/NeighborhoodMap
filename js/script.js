@@ -99,25 +99,28 @@ function initMap() {
             image: image,
             address: address,
             id: i,
+            animation: null
         });
 
         markers.push(marker);
         loadMarkers();
         marker.addListener('click', function() {
             populateInfoWindow(this, largeInfowindow);
-            toggleBounce(this, largeInfowindow);
+            toggleBounce(this);
+
         });
+
     }
 
 }
 
-function toggleBounce(marker, infowindow) {
-    if (infowindow.marker.getAnimation() !== null) {
-        infowindow.marker.setAnimation(null);
+function toggleBounce(marker) {
+    if (marker.getAnimation() !== null) {
+        marker.setAnimation(null);
     } else {
-        infowindow.marker.setAnimation(google.maps.Animation.BOUNCE);
+        marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
-            infowindow.marker.setAnimation(null);
+            marker.setAnimation(null);
         }, 1400);
     }
 }
@@ -155,7 +158,7 @@ var viewModel = function() {
     var self = this;
     self.itemClick = function(marker) {
         google.maps.event.trigger(this.marker, 'click');
-        toggleBounce(this, largeInfowindow);
+        toggleBounce(this.marker);
     };
 
 
